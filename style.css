@@ -1,0 +1,610 @@
+/* Estilos gerais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(180deg,
+        #001122 0%,    /* Superfície do mar - noite */
+        #003366 15%,   /* Águas rasas */
+        #004488 30%,   /* Zona fótica */
+        #0066aa 45%,   /* Zona mesopelágica */
+        #002244 60%,   /* Zona batipelágica */
+        #001133 80%,   /* Zona abissal */
+        #000011 100%   /* Zona hadal */
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: #fff;
+    position: relative;
+    overflow-x: hidden;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image:
+        radial-gradient(circle at 10% 20%, rgba(0, 255, 255, 0.4) 1px, transparent 1px),
+        radial-gradient(circle at 80% 80%, rgba(135, 206, 250, 0.3) 2px, transparent 2px),
+        radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.2) 1px, transparent 1px),
+        radial-gradient(circle at 90% 10%, rgba(0, 191, 255, 0.3) 1px, transparent 1px),
+        radial-gradient(circle at 30% 70%, rgba(173, 216, 230, 0.2) 1px, transparent 1px);
+    background-size: 300px 300px, 200px 200px, 150px 150px, 250px 250px, 180px 180px;
+    animation: floatParticles 25s infinite linear;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes floatParticles {
+    0% { transform: translateY(100vh) translateX(0px) rotate(0deg); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100vh) translateX(100px) rotate(360deg); opacity: 0; }
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    bottom: 0; left: 0; width: 200%; height: 200px;
+    background: linear-gradient(90deg,
+        transparent, rgba(0, 255, 255, 0.1), transparent,
+        rgba(135, 206, 250, 0.1), transparent );
+    animation: waves 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: -1;
+}
+
+@keyframes waves {
+    0%, 100% { transform: translateX(-50%) translateY(0px); opacity: 0.3; }
+    50% { transform: translateX(-25%) translateY(-20px); opacity: 0.7; }
+}
+
+header {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 17, 34, 0.9), rgba(0, 51, 102, 0.8));
+    backdrop-filter: blur(15px);
+    border-bottom: 4px solid #00ffff;
+    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+header::before {
+    content: '';
+    position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+header h1 {
+    font-family: 'Roboto Slab', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700; color: #00ffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4);
+    margin-bottom: 0.5rem;
+    animation: glow 2s ease-in-out infinite alternate;
+    position: relative; z-index: 1;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4); }
+    to { text-shadow: 0 0 15px rgba(0, 255, 255, 1), 0 0 25px rgba(0, 255, 255, 0.8), 0 0 35px rgba(0, 255, 255, 0.6); }
+}
+
+/* --- TIMELINE HORIZONTAL --- */
+.timeline {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 40px 0;
+    margin: 3rem auto;
+    width: 100%;
+    min-height: 650px; /* Aumentado para acomodar cards "para fora" */
+    position: relative;
+    -webkit-overflow-scrolling: touch;
+}
+
+.timeline-track {
+    display: flex;
+    position: relative;
+    padding: 0 60px;
+    margin: 0 auto;
+    height: 100%; /* Necessário para que top:50% da linha funcione corretamente */
+}
+
+.timeline-track::before { /* Linha horizontal principal */
+    content: '';
+    position: absolute;
+    top: 50%; /* Centraliza a linha na altura do track */
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: linear-gradient(90deg, #00ffff 0%, #00aaff 30%, #0080ff 60%, #0050cc 100%);
+    transform: translateY(-50%);
+    z-index: 1; /* Camada mais baixa */
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 170, 255, 0.3);
+    animation: currentFlowHorizontal 6s ease-in-out infinite alternate;
+}
+
+@keyframes currentFlowHorizontal {
+    from { box-shadow: 0 0 15px rgba(0, 255, 255, 0.5), 0 0 20px rgba(0, 170, 255, 0.3); }
+    to { box-shadow: 0 0 25px rgba(0, 255, 255, 0.8), 0 0 35px rgba(0, 170, 255, 0.5); }
+}
+
+.timeline-container {
+    flex: 0 0 380px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* padding-left/right define espaçamento horizontal entre os ITENS (.timeline-container) */
+    padding-left: 25px;
+    padding-right: 25px;
+    z-index: 2; /* Acima da linha do track */
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+    transition: transform 0.3s ease;
+}
+
+.timeline-container.is-visible {
+    animation: fadeInUpTimelineItem 0.7s 0.2s ease-out forwards;
+}
+
+@keyframes fadeInUpTimelineItem {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.timeline-dot { /* Área clicável da bolinha */
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    top: 50%; /* Centralizado no .timeline-container, que deve alinhar com a linha do track */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 5; /* Acima do círculo visual e do card */
+    cursor: pointer;
+    transition: transform 0.2s ease-out;
+}
+
+.timeline-dot:hover {
+    transform: translate(-50%, -50%) scale(1.3);
+}
+
+.timeline-container::after { /* Círculo visual da bolinha */
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #a0ffb0 0%, #00ffff 40%, #00aaff 100%);
+    border: 5px solid #001122; /* Cor de fundo do body para efeito de recorte */
+    top: 50%; /* Centralizado no .timeline-container */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    z-index: 4; /* Acima do card e do conector */
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 200, 255, 0.4);
+    animation: bioluminescence 2.5s infinite ease-in-out;
+}
+
+.timeline-content { /* Card de conteúdo ("quadro") */
+    padding: 25px 30px;
+    background: linear-gradient(135deg, rgba(0, 51, 102, 0.95) 0%, rgba(0, 68, 136, 0.9) 50%, rgba(0, 34, 68, 0.95) 100%);
+    position: relative;
+    border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 255, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1.5px solid rgba(0, 255, 255, 0.35);
+    transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: default;
+    width: 100%;
+    z-index: 3; /* Acima do conector e da linha principal */
+}
+
+.timeline-content::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(45deg, transparent 30%, rgba(0, 255, 255, 0.08) 50%, transparent 70%);
+    opacity: 0; transition: opacity 0.3s ease;
+    pointer-events: none; border-radius: inherit;
+}
+.timeline-content:hover::before {
+    opacity: 1;
+}
+
+.timeline-connector { /* Haste vertical */
+    width: 5px;
+    background: #00aaff;
+    box-shadow: 0 0 8px rgba(0, 170, 255, 0.6);
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2; /* Acima da linha principal, abaixo do card e da bolinha */
+    border-radius: 2.5px;
+}
+
+/* --- POSICIONAMENTO ALTERNADO DOS CARDS "PARA FORA" --- */
+/* Raio da bolinha (::after) = 15px (30px / 2) */
+/* Margem desejada do card para a linha central = 60px */
+/* Altura do conector = Margem do card - Raio da bolinha = 60px - 15px = 45px */
+
+.timeline-container:nth-child(odd) { /* Card ACIMA da linha */
+    justify-content: flex-start; /* Alinha o .timeline-content no topo */
+    padding-top: 20px;   /* Espaço acima do card */
+    padding-bottom: 80px;/* Espaço para a bolinha e respiro abaixo da linha central */
+}
+/* Quando card está acima, a base do card está 60px acima do centro da bolinha */
+/* Para que o conector “desça” 45px desde a base do card até o centro da bolinha: */
+.timeline-container:nth-child(odd) .timeline-connector {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 45px; /* Distância até o centro da bolinha */
+    top: calc(50% - 60px); /* (50% do container = centro da bolinha) - 60px = base do card */
+    background: #00aaff;
+    box-shadow: 0 0 8px rgba(0, 170, 255, 0.6);
+    border-radius: 2.5px;
+    z-index: 2; /* vem acima da linha principal, abaixo do card e da bolinha */
+}
+
+.timeline-container:nth-child(odd) .timeline-content {
+    margin-top: -50px;   /* Ajuste fixo para afastar o card da linha central */
+    margin-bottom: 550px;/* Ajuste para posicionar o card a 60px acima da linha */
+}
+.timeline-container:nth-child(odd) .timeline-content:hover {
+    transform: translateY(-10px) scale(1.025);
+}
+
+.timeline-container:nth-child(even) { /* Card ABAIXO da linha */
+    justify-content: flex-end; /* Alinha o .timeline-content na base */
+    padding-bottom: 20px; /* Espaço abaixo do card */
+    padding-top: 80px;    /* Espaço para a bolinha e respiro acima da linha central */
+}
+/* Quando card está abaixo, o topo do card está 60px abaixo do centro da bolinha */
+/* Para que o conector “suba” 45px desde o topo do card até o centro da bolinha: */
+.timeline-container:nth-child(even) .timeline-connector {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 5px;
+    height: 45px; /* Mesma distância até o centro da bolinha */
+    bottom: calc(50% - 60px); /* (50% do container = centro da bolinha) - 60px = topo do card */
+    background: #00aaff;
+    box-shadow: 0 0 8px rgba(0, 170, 255, 0.6);
+    border-radius: 2.5px;
+    z-index: 2; /* vem acima da linha principal, abaixo do card e da bolinha */
+}
+
+.timeline-container:nth-child(even) .timeline-content {
+    margin-bottom: 0;
+    margin-top: 60px; /* Distância do topo do card para o centro da bolinha */
+}
+.timeline-container:nth-child(even) .timeline-content:hover {
+    transform: translateY(10px) scale(1.025);
+}
+
+.timeline-container:nth-child(even) .timeline-connector {
+    height: 45px; /* (Margem card:60px) - (Raio bolinha:15px) */
+    /* O conector sobe do topo do card até a base da bolinha */
+    /* Base da bolinha está em (centro Y do container + 15px) */
+    /* Topo do card está em (centro Y do container + 60px) */
+    bottom: calc(50% - 60px); /* (Centro Y do container) - (Margem do card) -> Alinha base do conector com topo do card */
+    top: auto;
+}
+
+
+.timeline-content h2 {
+    font-family: 'Roboto Slab', serif;
+    color: #00ffff;
+    font-size: clamp(1.4rem, 2.2vw, 1.7rem);
+    font-weight: 600;
+    margin-bottom: 15px;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    position: relative;
+    z-index: 1;
+}
+.timeline-content h2::after {
+    content: ''; position: absolute; bottom: -8px; left: 0;
+    width: 0px; height: 3.5px;
+    background: linear-gradient(to right, #00ffff, #0080ff, transparent);
+    border-radius: 2px;
+    animation: expandLine 0.6s ease-out 0.4s forwards;
+}
+@keyframes expandLine {
+    from { width: 0; }
+    to { width: 55px; }
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    position: relative; z-index: 1;
+}
+.text-content p {
+    margin-bottom: 10px;
+    line-height: 1.65;
+    color: #e6f3ff;
+    font-size: clamp(0.9rem, 1.6vw, 1rem);
+    text-align: justify;
+    opacity: 0; transform: translateY(15px);
+}
+
+.timeline-container.is-visible .text-content p { animation: fadeInTextTimeline 0.5s ease-out forwards; }
+.timeline-container.is-visible .text-content p:nth-child(1) { animation-delay: 0.5s; }
+.timeline-container.is-visible .text-content p:nth-child(2) { animation-delay: 0.7s; }
+.timeline-container.is-visible .text-content p:nth-child(3) { animation-delay: 0.9s; }
+
+@keyframes fadeInTextTimeline {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.image-container {
+    flex-shrink: 0;
+    width: 100%;
+    max-height: 170px;
+    min-height: 120px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(45deg, rgba(0, 255, 255, 0.05), rgba(0, 128, 255, 0.05));
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.15);
+    animation: bioluminescenceImage 3.5s infinite alternate;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-container img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: inherit;
+    transition: transform 0.4s ease;
+}
+
+.image-container:hover img {
+    transform: scale(1.05);
+}
+
+
+@keyframes bioluminescenceImage {
+    from { box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.15); border-color: rgba(0, 255, 255, 0.2); }
+    to { box-shadow: 0 0 20px rgba(0, 255, 255, 0.45), inset 0 0 12px rgba(255, 255, 255, 0.25); border-color: rgba(0, 255, 255, 0.35); }
+}
+
+
+/* --- ESTILOS DO MODAL --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 25, 51, 0.85);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0s linear 0.4s;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.4s ease;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, #002244, #003366);
+    margin: auto;
+    padding: 30px;
+    border: 2px solid #00ffff;
+    border-radius: 20px;
+    width: 80%;
+    max-width: 900px;
+    box-shadow: 0 10px 40px rgba(0, 255, 255, 0.3), 0 0 20px rgba(0, 150, 255, 0.2);
+    position: relative;
+    color: #e6f3ff;
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+
+.modal.active .modal-content {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+.close-button {
+    color: #00ffff;
+    position: absolute;
+    top: 15px;
+    right: 25px;
+    font-size: 32px;
+    font-weight: bold;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #ffffff;
+    text-decoration: none;
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+.modal-header {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(0, 255, 255, 0.3);
+}
+
+.modal-header h2 {
+    font-family: 'Roboto Slab', serif;
+    color: #00ffff;
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+    text-align: center;
+}
+
+.modal-body {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+}
+
+.modal-image-container {
+    flex: 1 1 40%;
+    max-width: 350px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0,0,0,0.1);
+}
+
+.modal-image-container img {
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+    object-fit: contain;
+    display: block;
+    border-radius: 10px;
+}
+
+.modal-text-content {
+    flex: 1 1 60%;
+    max-height: 450px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.modal-text-content p {
+    font-size: clamp(0.9rem, 1.5vw, 1rem);
+    line-height: 1.7;
+    margin-bottom: 15px;
+    text-align: justify;
+    color: #cceeff;
+}
+.modal-text-content p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-text-content::-webkit-scrollbar { width: 8px; }
+.modal-text-content::-webkit-scrollbar-track { background: rgba(0, 85, 136, 0.5); border-radius: 4px; }
+.modal-text-content::-webkit-scrollbar-thumb { background: #00aaff; border-radius: 4px; }
+.modal-text-content::-webkit-scrollbar-thumb:hover { background: #00ffff; }
+
+/* Rodapé */
+footer {
+    text-align: center; padding: 2rem 1rem; margin-top: 3rem;
+    background-color: rgba(0, 17, 34, 0.8); color: #aabbcc;
+    border-top: 2px solid #005588;
+}
+footer p { margin: 0.3rem 0; font-size: 0.9rem; }
+
+/* Animação bioluminescência para os círculos */
+@keyframes bioluminescence {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 200, 255, 0.4), inset 0 0 8px rgba(220, 255, 255, 0.3);
+        transform: translate(-50%, -50%) scale(1);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(0, 255, 255, 1), 0 0 45px rgba(0, 200, 255, 0.6), inset 0 0 12px rgba(220, 255, 255, 0.5);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Media Queries para Responsividade */
+@media screen and (max-width: 900px) {
+    .timeline-container {
+        flex: 0 0 340px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .timeline-container:nth-child(odd) { padding-top: 15px; padding-bottom: 70px; }
+    .timeline-container:nth-child(odd) .timeline-content { margin-bottom: 50px; }
+    .timeline-container:nth-child(odd) .timeline-connector { height: 35px; top: calc(50% - 50px); }
+
+    .timeline-container:nth-child(even) { padding-bottom: 15px; padding-top: 70px; }
+    .timeline-container:nth-child(even) .timeline-content { margin-top: 50px; }
+    .timeline-container:nth-child(even) .timeline-connector { height: 35px; bottom: calc(50% - 50px); }
+
+    .timeline-content { padding: 20px 25px; }
+    .modal-body { flex-direction: column; }
+    .modal-image-container { max-width: 100%; margin-bottom: 20px; }
+    .modal-image-container img { max-height: 250px; }
+    .modal-text-content { max-height: 300px; }
+}
+
+@media screen and (max-width: 768px) {
+    .timeline { min-height: 600px; padding: 30px 0; }
+    .timeline-track { padding: 0 0px; }
+    .timeline-container {
+        flex: 0 0 500px;
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+    .timeline-container:nth-child(odd) { padding-top: 10px; padding-bottom: 60px; }
+    .timeline-container:nth-child(odd) .timeline-content { margin-bottom: 40px; }
+    .timeline-container:nth-child(odd) .timeline-connector { height: 25px; top: calc(50% - 40px); }
+
+    .timeline-container:nth-child(even) { padding-bottom: 10px; padding-top: 60px; }
+    .timeline-container:nth-child(even) .timeline-content { margin-top: 40px; }
+    .timeline-container:nth-child(even) .timeline-connector { height: 25px; bottom: calc(50% - 40px); }
+
+    .timeline-content h2 { font-size: clamp(1.3rem, 2vw, 1.5rem); }
+    .text-content p { font-size: clamp(0.85rem, 1.5vw, 0.95rem); }
+    .modal-content { width: 90%; padding: 20px; }
+    .modal-header h2 { font-size: clamp(1.4rem, 4vw, 1.8rem); }
+}
+
+@media screen and (max-width: 600px) {
+    .timeline { min-height: auto; }
+    .timeline-track { padding: 0 15px; }
+    .timeline-container {
+        flex: 0 0 280px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .timeline-container:nth-child(odd) { padding-top: 5px; padding-bottom: 50px; }
+    .timeline-container:nth-child(odd) .timeline-content { margin-bottom: 30px; }
+    .timeline-container:nth-child(odd) .timeline-connector { height: 15px; top: calc(50% - 30px); }
+
+    .timeline-container:nth-child(even) { padding-bottom: 5px; padding-top: 50px; }
+    .timeline-container:nth-child(even) .timeline-content { margin-top: 30px; }
+    .timeline-container:nth-child(even) .timeline-connector { height: 15px; bottom: calc(50% - 30px); }
+    
+    .timeline-content { padding: 18px 20px; border-radius: 15px; }
+    .timeline-content h2 { font-size: clamp(1.2rem, 4vw, 1.4rem); margin-bottom: 12px; }
+    .timeline-content h2::after{ width: 45px; height: 3px; bottom: -7px; }
+    .image-container { max-height: 140px; min-height: 100px; }
+    .modal-body { gap: 15px; }
+    .modal-image-container img { max-height: 200px; }
+    .modal-text-content p { font-size: clamp(0.8rem, 2.5vw, 0.9rem); }
+}
