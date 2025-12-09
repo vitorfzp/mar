@@ -3,202 +3,580 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invertebrados Aquáticos - Linha do Tempo Horizontal</title>
-    <link rel="shortcut icon" href="img/logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <title>PROTOCOL: HIVE_MIND // REBOOT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rubik+Glitch&display=swap');
+
+        :root {
+            --neon: #00ffaa;
+            --blood: #ff0055;
+            --void: #050505;
+            --alert: #ffaa00;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: crosshair; }
+
+        body {
+            background: var(--void);
+            color: var(--neon);
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            transition: background 0.5s;
+        }
+
+        /* ANIMAÇÃO DE REBOOT (FLASH) */
+        @keyframes reboot-flash {
+            0% { filter: invert(0); }
+            50% { filter: invert(1); background: white; }
+            100% { filter: invert(0); background: var(--void); }
+        }
+
+        .rebooting {
+            animation: reboot-flash 1s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+        }
+
+        /* ANIMAÇÃO DE TERREMOTO */
+        @keyframes earthquake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .shake-screen { animation: earthquake 0.1s infinite; }
+
+        /* --- LAYERS --- */
+        #canvas-fluid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            filter: blur(2px) contrast(1.2); transition: filter 0.5s;
+        }
+
+        #ui-layer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10;
+            pointer-events: none;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+        }
+
+        /* --- BOTÕES --- */
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 100;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            transition: opacity 0.8s;
+        }
+
+        .glitch-btn {
+            background: transparent; border: 2px solid var(--neon); color: var(--neon);
+            padding: 20px 40px; font-size: 2rem; font-family: inherit;
+            text-transform: uppercase; letter-spacing: 4px; position: relative; overflow: hidden;
+            transition: 0.2s; cursor: pointer; pointer-events: auto;
+        }
+        .glitch-btn:hover { background: var(--neon); color: #000; box-shadow: 0 0 50px var(--neon); }
+        .glitch-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
+            transition: 0.5s;
+        }
+        .glitch-btn:hover::before { left: 100%; }
+
+        /* BOTÃO DE REBOOT (ESCONDIDO INICIALMENTE) */
+        #reboot-container {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 200; display: none; opacity: 0; transition: opacity 2s;
+        }
+        #reboot-btn {
+            border-color: var(--alert); color: var(--alert); font-size: 3rem; background: rgba(0,0,0,0.8);
+            animation: pulse-alert 1s infinite;
+        }
+        @keyframes pulse-alert {
+            0% { box-shadow: 0 0 10px var(--alert); }
+            50% { box-shadow: 0 0 40px var(--alert); }
+            100% { box-shadow: 0 0 10px var(--alert); }
+        }
+
+        /* --- CONTENT --- */
+        #specimen-rack {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 80%; height: 80%; z-index: 5;
+            display: flex; align-items: center; justify-content: space-between;
+            perspective: 2000px; pointer-events: none; 
+        }
+
+        .specimen-card {
+            position: absolute; width: 400px; padding: 20px;
+            background: rgba(0, 10, 10, 0.9); border: 1px solid var(--neon);
+            box-shadow: 0 0 20px rgba(0, 255, 170, 0.1); opacity: 0;
+            transform: translateZ(-1000px) rotateY(45deg);
+            transition: all 1s cubic-bezier(0.19, 1, 0.22, 1);
+            display: flex; flex-direction: column; gap: 20px; backdrop-filter: blur(10px);
+            transform-origin: center center; will-change: transform, left, top;
+        }
+
+        .specimen-card.active { opacity: 1; transform: translateZ(0) rotateY(0deg); z-index: 10; }
+        .specimen-card.prev { opacity: 0.3; transform: translateX(-120%) translateZ(-500px) rotateY(20deg); }
+        .specimen-card.next { opacity: 0.3; transform: translateX(120%) translateZ(-500px) rotateY(-20deg); }
+
+        /* MODO CAOS */
+        .physics-object { transition: none !important; opacity: 1 !important; position: fixed; z-index: 100; pointer-events: auto; }
+        .specimen-card.chaos-mode { box-shadow: 0 0 30px var(--blood); border-color: var(--blood); }
+        .broken-text { font-family: 'Rubik Glitch', cursive; color: var(--blood); font-size: 5rem; text-shadow: 0 0 20px var(--blood); user-select: none; text-transform: uppercase; }
+
+        .img-scanner { width: 100%; height: 250px; position: relative; overflow: hidden; border-bottom: 2px solid var(--neon); background: #000; }
+        .img-scanner img { width: 100%; height: 100%; object-fit: contain; filter: grayscale(100%) brightness(0.6) contrast(1.5); }
+        .chaos-mode .img-scanner { border-color: var(--blood); }
+        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--neon); box-shadow: 0 0 15px var(--neon); animation: scan 2s linear infinite; opacity: 0.7; }
+        @keyframes scan { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+
+        .specimen-data h1 { font-size: 2rem; text-shadow: 0 0 10px var(--neon); margin-bottom: 10px; }
+        .specimen-data p { font-size: 0.9rem; line-height: 1.6; color: #aaa; border-left: 2px solid var(--blood); padding-left: 15px; }
+
+        .hud-top { position: fixed; top: 20px; left: 20px; font-size: 12px; color: var(--neon); z-index: 20; }
+        .hud-bot { position: fixed; bottom: 20px; right: 20px; font-size: 12px; color: var(--blood); text-align: right; z-index: 20; }
+        .spectrum-analyzer { position: fixed; bottom: 0; left: 0; width: 100%; height: 100px; z-index: 2; opacity: 0.5; display: flex; align-items: flex-end; justify-content: space-around; pointer-events: none; }
+        .bar { width: 1%; background: var(--neon); transition: height 0.05s ease; }
+
+    </style>
 </head>
 <body>
-    <header>
-        <h1>A Profunda Jornada dos Invertebrados Aquáticos 🐙🌊🐚</h1>
-    </header>
 
-    <div class="timeline">
-        <div class="timeline-track">
-            <div class="timeline-container" data-title="Ancestral Protista">
-                <div class="timeline-dot" data-index="0"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Ancestral Protista</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Foram os primeiros seres vivos com células complexas (eucariontes).</p>
-                            <p>Alguns viviam em colônias no oceano e, com o tempo, essas colônias passaram a funcionar juntas, dando origem aos primeiros animais multicelulares.</p>
-                            <p>São os ancestrais das esponjas e de todos os outros animais.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/ancestral.png" alt="Ilustração de um Ancestral Protista">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Poríferos (Esponjas)">
-                <div class="timeline-dot" data-index="1"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Poríferos (Esponjas)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Animais muito simples que vivem fixos no fundo do mar.</p>
-                            <p>O corpo tem poros por onde a água entra e sai, levando oxigênio e alimento.</p>
-                            <p>Não têm órgãos, músculos nem nervos. Alimentam-se filtrando a água com células chamadas coanócitos.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/esponja.png" alt="Ilustração de uma Esponja Marinha">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Cnidários (Águas-vivas, Corais, Anêmonas)">
-                <div class="timeline-dot" data-index="2"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Cnidários (Águas-vivas, Corais, Anêmonas)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Têm corpo gelatinoso e tentáculos ao redor da boca. Usam células com veneno (cnidócitos) para capturar presas.</p>
-                            <p>Possuem uma cavidade digestiva simples e vivem tanto fixos (corais) quanto flutuando (águas-vivas).</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/cnidários.png" alt="Ilustração de uma Água-viva">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Platelmintos (Planárias, Tênias)">
-                <div class="timeline-dot" data-index="3"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Platelmintos (Planárias, Tênias)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>São vermes achatados, com simetria bilateral.</p>
-                            <p>Vivem na água doce ou como parasitas. Têm boca, mas não têm ânus.</p>
-                            <p>Possuem sistema nervoso simples e algumas espécies conseguem se regenerar.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/platelmintos.png" alt="Ilustração de uma Planária Aquática">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Nematelmintos (Lombrigas, Nematoides)">
-                <div class="timeline-dot" data-index="4"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Nematelmintos (Lombrigas, Nematoides)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Vermes com corpo cilíndrico e fino.</p>
-                            <p>Têm tubo digestivo completo (boca e ânus) e um revestimento protetor.</p>
-                            <p>Muitos vivem em ambientes aquáticos, mas também existem formas parasitas que atacam plantas, animais e humanos.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/nematelmintos.png" alt="Ilustração de um Nematelminto Aquático">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Moluscos (Polvos, Lulas, Mariscos)">
-                <div class="timeline-dot" data-index="5"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Moluscos (Polvos, Lulas, Mariscos)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Têm corpo mole, dividido em cabeça, pé muscular e massa visceral.</p>
-                            <p>Alguns têm conchas (como mariscos), outros não (como polvos). Os polvos e lulas são inteligentes e ágeis;</p>
-                            <p>os mariscos são filtradores e vivem protegidos em conchas.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/polvo.png" alt="Ilustração de um Polvo">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Anelídeos (Minhocas Marinhas, Nereis)">
-                <div class="timeline-dot" data-index="6"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Anelídeos (Minhocas Marinhas, Nereis)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Vermes com corpo segmentado em anéis.</p>
-                            <p>Têm sangue, intestino completo e se movimentam com músculos e cerdas. Algumas espécies respiram por brânquias.</p>
-                            <p>Vivem enterrados na areia ou lama do fundo do mar.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/anelídeos.png" alt="Ilustração de uma Nereis (Anelídeo Marinho)">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Artrópodes Aquáticos (Camarões, Caranguejos)">
-                <div class="timeline-dot" data-index="7"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Artrópodes Aquáticos (Camarões, Caranguejos)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Têm o corpo com patas articuladas e um esqueleto externo rígido (quitinoso).</p>
-                            <p>Usam brânquias para respirar e têm olhos compostos. São muito diversos e importantes para o equilíbrio ecológico e para a alimentação humana.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/carangueijo.png" alt="Ilustração de um Caranguejo">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-
-            <div class="timeline-container" data-title="Equinodermos (Estrelas-do-mar, Ouriços)">
-                <div class="timeline-dot" data-index="8"></div>
-                <div class="timeline-connector"></div>
-                <div class="timeline-content">
-                    <h2>Equinodermos (Estrelas-do-mar, Ouriços)</h2>
-                    <div class="content-wrapper">
-                        <div class="text-content">
-                            <p>Possuem simetria radial e um esqueleto interno feito de placas calcárias.</p>
-                            <p>Usam pés com ventosas, movidos por um sistema hidráulico, para andar e respirar.</p>
-                            <p>Vivem apenas no mar e têm grande capacidade de regeneração.</p>
-                        </div>
-                        <figure class="image-container">
-                            <img src="img/estrela.png" alt="Ilustração de uma Estrela-do-mar">
-                        </figure>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div id="boot-screen">
+        <h2 style="color:var(--blood); margin-bottom:10px;">SYSTEM: OFFLINE</h2>
+        <p style="margin-bottom:40px; color:#666;">AUDIO DRIVERS REQUIRED FOR NEURAL LINK</p>
+        <button class="glitch-btn" id="start-btn">INICIALIZAR</button>
     </div>
 
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div class="modal-header">
-                <h2 id="modal-title"></h2>
-            </div>
-            <div class="modal-body">
-                <div class="modal-image-container">
-                    <img id="modal-img" src="" alt="">
-                </div>
-                <div class="modal-text-content">
-                    <div id="modal-description"></div>
-                </div>
-            </div>
-        </div>
+    <div id="reboot-container">
+        <button class="glitch-btn" id="reboot-btn">EMERGENCY REBOOT</button>
+        <p style="color: var(--alert); text-align: center; margin-top: 10px; font-size: 0.8rem;">CLICK TO RESTORE TIMELINE</p>
     </div>
 
-    <footer>
-        <p>Criado Por João Vitor, Lorena, Giovani, Luis Octavio e Mathias</p>
-        <p>&copy; <span id="currentYear"></span> Criado para fins educacionais.</p>
-    </footer>
+    <canvas id="canvas-fluid"></canvas>
+    <div id="ui-layer"></div>
 
-    <script src="script.js"></script>
+    <div class="hud-top">
+        // PROJECT: MAR_DEEP_DIVE<br>
+        // STATUS: <span id="status-text">STABLE</span><br>
+        // DEPTH: <span id="depth-display">0000</span>m
+    </div>
+
+    <div class="hud-bot">
+        WARNING: HIGH PRESSURE<br>
+        BIO-SIGNS: DETECTED<br>
+        <span id="coord-display">LAT: 00.00 LON: 00.00</span>
+    </div>
+
+    <div class="spectrum-analyzer" id="spectrum"></div>
+
+    <div id="specimen-rack"></div>
+    <div id="debris-container"></div>
+
+    <script>
+        // --- DADOS ---
+        const database = [
+            { name: "ANCESTRAL_PROTISTA", file: "img/ancestral.png", desc: "A Semente. Eucariontes primordiais.", freq: 200 },
+            { name: "PORÍFEROS_ESPONJA", file: "img/esponja.png", desc: "O Filtro Eterno. Apenas poros.", freq: 250 },
+            { name: "CNIDÁRIOS_MEDUSA", file: "img/cnidários.png", desc: "Fantasma Gelatinoso. Beleza tóxica.", freq: 300 },
+            { name: "PLATELMINTOS", file: "img/platelmintos.png", desc: "A Primeira Direção. Vermes achatados.", freq: 350 },
+            { name: "NEMATELMINTOS", file: "img/nematelmintos.png", desc: "O Parasita Perfeito. Tubo dentro de um tubo.", freq: 400 },
+            { name: "MOLUSCOS_POLVO", file: "img/polvo.png", desc: "Inteligência Alienígena. 9 cérebros.", freq: 450 },
+            { name: "ANELÍDEOS", file: "img/anelídeos.png", desc: "Engenharia Segmentada. Recicladores.", freq: 500 },
+            { name: "ARTRÓPODES", file: "img/carangueijo.png", desc: "Blindados. Máquinas de guerra.", freq: 550 },
+            { name: "EQUINODERMOS", file: "img/estrela.png", desc: "Geometria Sagrada. O fim da linha.", freq: 600 },
+        ];
+
+        // --- AUDIO ---
+        let audioCtx, masterGain, drone, lfo, siren;
+        let isAudioInit = false;
+
+        function initAudio() {
+            if(isAudioInit) return;
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            masterGain = audioCtx.createGain();
+            masterGain.gain.value = 0.1;
+            masterGain.connect(audioCtx.destination);
+
+            drone = audioCtx.createOscillator();
+            drone.type = 'sawtooth';
+            drone.frequency.value = 50;
+            const droneFilter = audioCtx.createBiquadFilter();
+            droneFilter.type = 'lowpass';
+            droneFilter.frequency.value = 200;
+            
+            lfo = audioCtx.createOscillator();
+            lfo.type = 'sine';
+            lfo.frequency.value = 0.1;
+            const lfoGain = audioCtx.createGain();
+            lfoGain.gain.value = 100;
+
+            lfo.connect(lfoGain);
+            lfoGain.connect(droneFilter.frequency);
+            drone.connect(droneFilter);
+            droneFilter.connect(masterGain);
+            
+            drone.start();
+            lfo.start();
+            isAudioInit = true;
+            createVisualizerBars();
+        }
+
+        function playScanSound(freq) {
+            if (!isAudioInit) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(freq * 0.5, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function playGlitch() {
+            if(!isAudioInit) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(Math.random() * 1000 + 100, audioCtx.currentTime);
+            gain.gain.value = 0.05;
+            osc.connect(gain);
+            gain.connect(masterGain);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.1);
+        }
+
+        // --- RENDER DOM ---
+        const rack = document.getElementById('specimen-rack');
+        function renderCards() {
+            rack.innerHTML = '';
+            database.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'specimen-card';
+                card.id = `card-${index}`;
+                
+                card.innerHTML = `
+                    <div class="img-scanner">
+                        <div class="scan-line"></div>
+                        <img src="${item.file}" alt="${item.name}">
+                    </div>
+                    <div class="specimen-data">
+                        <h1>${item.name.split('_')[0]}</h1>
+                        <p>${item.desc}</p>
+                        <div style="margin-top:15px; font-size:0.8rem; color:inherit;">ID: ${Math.random().toString(36).substring(7).toUpperCase()}</div>
+                    </div>
+                `;
+                rack.appendChild(card);
+            });
+        }
+        renderCards();
+
+        function createVisualizerBars() {
+            const container = document.getElementById('spectrum');
+            container.innerHTML = '';
+            for(let i=0; i<30; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'bar';
+                container.appendChild(bar);
+            }
+            animateSpectrum();
+        }
+        function animateSpectrum() {
+            const bars = document.querySelectorAll('.bar');
+            bars.forEach(bar => {
+                const h = Math.random() * 80;
+                bar.style.height = h + '%';
+                bar.style.backgroundColor = h > 70 ? 'var(--blood)' : 'var(--neon)';
+            });
+            if(isAudioInit) requestAnimationFrame(animateSpectrum);
+        }
+
+        // --- CANVAS ---
+        const canvas = document.getElementById('canvas-fluid');
+        const ctx = canvas.getContext('2d');
+        let width, height, particles = [];
+        let canvasColor1 = '#00ffaa', canvasColor2 = '#ff0055';
+        let isRainingCode = false;
+
+        function resize() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width; this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 2;
+                this.size = Math.random() * 2; this.color = Math.random() > 0.9 ? canvasColor2 : canvasColor1;
+                this.char = String.fromCharCode(0x30A0 + Math.random() * 96); 
+            }
+            update() {
+                if (isRainingCode) {
+                    this.y += Math.abs(this.vy) * 10 + 5; 
+                    this.x += (Math.random() - 0.5);
+                    if (this.y > height) this.y = 0;
+                    this.color = '#ff0000';
+                } else {
+                    this.x += this.vx; this.y += this.vy;
+                    if(this.x < 0) this.x = width; if(this.x > width) this.x = 0;
+                    if(this.y < 0) this.y = height; if(this.y > height) this.y = 0;
+                    this.color = Math.random() > 0.9 ? canvasColor2 : canvasColor1;
+                }
+            }
+            draw() { 
+                ctx.fillStyle = this.color; 
+                if (isRainingCode) {
+                    ctx.font = '15px monospace';
+                    ctx.fillText(this.char, this.x, this.y);
+                } else {
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); 
+                }
+            }
+        }
+        for(let i=0; i<150; i++) particles.push(new Particle());
+
+        function animateCanvas() {
+            ctx.fillStyle = isRainingCode ? 'rgba(0, 0, 0, 0.1)' : 'rgba(5, 5, 5, 0.1)'; 
+            ctx.fillRect(0, 0, width, height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            
+            if (!isRainingCode) {
+                ctx.strokeStyle = canvasColor1 === '#00ffaa' ? 'rgba(0, 255, 170, 0.05)' : 'rgba(255, 0, 0, 0.1)';
+                for(let i=0; i<particles.length; i++) {
+                    for(let j=i; j<particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx*dx + dy*dy);
+                        if(dist < 100) {
+                            ctx.beginPath(); ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y); ctx.stroke();
+                        }
+                    }
+                }
+            }
+            requestAnimationFrame(animateCanvas);
+        }
+        animateCanvas();
+
+        // --- CORE LOGIC ---
+        let currentIndex = 0;
+        let isTransitioning = false;
+        let chaosMode = false;
+        const totalCards = database.length;
+        let chaosObjects = [];
+        let mouse = { x: 0, y: 0, active: false };
+        let animationFrameId;
+
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        window.addEventListener('mousedown', () => mouse.active = true);
+        window.addEventListener('mouseup', () => mouse.active = false);
+
+        // Atualiza carrossel normal
+        function updateCarousel() {
+            if(chaosMode) return;
+            const cards = document.querySelectorAll('.specimen-card');
+            cards.forEach((card, i) => {
+                card.className = 'specimen-card';
+                card.style = ''; // Remove inline styles do caos
+                if (i === currentIndex) {
+                    card.classList.add('active');
+                    playScanSound(database[i].freq);
+                    document.getElementById('depth-display').innerText = (i * 1000 + 1500);
+                } else if (i < currentIndex) card.classList.add('prev');
+                else card.classList.add('next');
+            });
+            playGlitch();
+        }
+        
+        // Inicializa carrossel
+        updateCarousel();
+
+        function spawnBrokenText(text) {
+            const container = document.getElementById('debris-container');
+            const letters = text.split('');
+            const startX = (window.innerWidth / 2) - (letters.length * 30);
+            
+            letters.forEach((char, i) => {
+                if (char === ' ') return;
+                const span = document.createElement('div');
+                span.textContent = char;
+                span.className = 'physics-object broken-text';
+                span.style.left = (startX + (i * 60)) + 'px';
+                span.style.top = '50%';
+                container.appendChild(span);
+
+                const rect = span.getBoundingClientRect();
+                chaosObjects.push({
+                    el: span, x: rect.left, y: rect.top,
+                    vx: (Math.random() - 0.5) * 50, vy: (Math.random() - 0.5) * 50,
+                    rot: 0, vrot: (Math.random() - 0.5) * 20, mass: 0.5
+                });
+            });
+        }
+
+        function triggerChaos() {
+            if(chaosMode) return;
+            chaosMode = true;
+
+            document.body.classList.add('shake-screen');
+            setTimeout(() => document.body.classList.remove('shake-screen'), 1000);
+
+            document.getElementById('status-text').innerText = "FATAL ERROR";
+            document.getElementById('status-text').style.color = "var(--blood)";
+            document.body.style.background = "#110000";
+            isRainingCode = true;
+
+            // Mostra botão de reboot com delay
+            const rebootContainer = document.getElementById('reboot-container');
+            rebootContainer.style.display = 'block';
+            setTimeout(() => rebootContainer.style.opacity = 1, 2000);
+
+            spawnBrokenText("FATAL ERROR");
+            spawnBrokenText("SYSTEM FAILURE");
+
+            if(audioCtx) {
+                siren = audioCtx.createOscillator();
+                siren.type = 'sawtooth';
+                siren.frequency.setValueAtTime(100, audioCtx.currentTime);
+                siren.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 2);
+                const sg = audioCtx.createGain();
+                sg.gain.value = 0.3;
+                siren.connect(sg); sg.connect(masterGain);
+                siren.start();
+                drone.frequency.linearRampToValueAtTime(20, audioCtx.currentTime + 2);
+            }
+
+            const cards = document.querySelectorAll('.specimen-card');
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                card.classList.remove('active', 'prev', 'next');
+                card.classList.add('physics-object', 'chaos-mode');
+                card.style.left = rect.left + 'px';
+                card.style.top = rect.top + 'px';
+                card.style.transform = 'none';
+                
+                chaosObjects.push({
+                    el: card, x: rect.left, y: rect.top,
+                    vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 0.5) * 30,
+                    rot: 0, vrot: (Math.random() - 0.5) * 10, mass: 1
+                });
+            });
+
+            updateChaosPhysics();
+        }
+
+        function updateChaosPhysics() {
+            if (!chaosMode) return;
+
+            chaosObjects.forEach(c => {
+                c.x += c.vx; c.y += c.vy; c.rot += c.vrot;
+
+                if(c.x < 0 || c.x > width - 100) { c.vx *= -0.8; }
+                if(c.y < 0 || c.y > height - 100) { c.vy *= -0.8; }
+
+                const centerX = c.x + (c.mass === 1 ? 200 : 20);
+                const centerY = c.y + (c.mass === 1 ? 300 : 40);
+                const dx = mouse.x - centerX;
+                const dy = mouse.y - centerY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+
+                if(dist < 800) {
+                    const force = 1500 / (dist + 50);
+                    if(mouse.active) {
+                        c.vx -= (dx / dist) * force * 2; c.vy -= (dy / dist) * force * 2;
+                    } else {
+                        c.vx += (dx / dist) * force * 0.2; c.vy += (dy / dist) * force * 0.2;
+                    }
+                }
+                
+                c.vx *= 0.96; c.vy *= 0.96;
+                c.el.style.left = c.x + 'px'; c.el.style.top = c.y + 'px';
+                c.el.style.transform = `rotate(${c.rot}deg)`;
+            });
+            animationFrameId = requestAnimationFrame(updateChaosPhysics);
+        }
+
+        // --- SYSTEM REBOOT ---
+        function rebootSystem() {
+            chaosMode = false;
+            cancelAnimationFrame(animationFrameId);
+
+            // Efeito Flash
+            document.body.classList.add('rebooting');
+            setTimeout(() => document.body.classList.remove('rebooting'), 1000);
+
+            // Reseta Audio
+            if(siren) {
+                siren.stop();
+                siren.disconnect();
+            }
+            if(drone) drone.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 1);
+
+            // Reseta UI
+            document.body.style.background = "var(--void)";
+            document.getElementById('status-text').innerText = "STABLE";
+            document.getElementById('status-text').style.color = "var(--neon)";
+            isRainingCode = false;
+
+            // Esconde Botão
+            const btn = document.getElementById('reboot-container');
+            btn.style.opacity = 0;
+            setTimeout(() => btn.style.display = 'none', 1000);
+
+            // Limpa Debris
+            document.getElementById('debris-container').innerHTML = '';
+            chaosObjects = [];
+
+            // Reseta Cards
+            currentIndex = 0; // Volta ao início
+            const cards = document.querySelectorAll('.specimen-card');
+            cards.forEach(card => {
+                card.classList.remove('physics-object', 'chaos-mode');
+                card.style = ''; // Remove styles inline
+            });
+
+            // Re-renderiza posição correta
+            updateCarousel();
+        }
+
+        // Event Listeners
+        window.addEventListener('wheel', (e) => {
+            if (isTransitioning || chaosMode) return;
+            if (e.deltaY > 0) {
+                if (currentIndex < totalCards - 1) {
+                    currentIndex++;
+                    isTransitioning = true;
+                    updateCarousel();
+                    setTimeout(() => isTransitioning = false, 800);
+                } else {
+                    triggerChaos();
+                }
+            } else if (e.deltaY < 0 && currentIndex > 0) {
+                currentIndex--;
+                isTransitioning = true;
+                updateCarousel();
+                setTimeout(() => isTransitioning = false, 800);
+            }
+        });
+
+        document.getElementById('start-btn').addEventListener('click', () => {
+            initAudio();
+            document.getElementById('boot-screen').style.opacity = 0;
+            setTimeout(() => { document.getElementById('boot-screen').remove(); playScanSound(200); }, 800);
+        });
+
+        document.getElementById('reboot-btn').addEventListener('click', rebootSystem);
+
+    </script>
 </body>
 </html>
